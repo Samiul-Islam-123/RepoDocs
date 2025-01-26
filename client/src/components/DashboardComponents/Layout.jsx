@@ -33,6 +33,8 @@ import { FaHistory } from "react-icons/fa"
 import { IoMdHome } from "react-icons/io"
 import { IoIosSettings } from "react-icons/io"
 import { useNavigate } from "react-router-dom"
+import { CgProfile } from "react-icons/cg";
+
 
 const drawerWidth = 240
 const collapsedDrawerWidth = 64
@@ -170,7 +172,7 @@ const Layout = ({ children }) => {
           { text: "Home", icon: <IoMdHome /> },
           { text: "Generate", icon: <RiAiGenerate2 /> },
           { text: "History", icon: <FaHistory /> },
-          { text: "Settings", icon: <IoIosSettings /> },
+          { text: "Settings", icon: <IoIosSettings />},
         ].map((item, index) => (
           <ListItem
             button
