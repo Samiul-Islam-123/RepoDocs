@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, Paper } from '@mui/material';
 import { useThemeContext } from '../../context/ThemeContext';
+import { useSocket } from '../../context/SocketContext';
 
 function Generate() {
   const [repoURL, setRepoURL] = useState('');
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [generatedReadme, setGeneratedReadme] = useState('');
   const { mode } = useThemeContext();
+  const {socket} = useSocket();
+
+  useEffect(() => {
+    if(socket){
+      console.log("Sending request...")
+      socket.emit('generate-request', ('sample data :)'))
+
+      socket.on('generate-reponse', data => {
+        console.log(data)
+      })
+    }
+  },[socket])
 
   const handleSelectChange = (event) => {
     setSelectedOptions(event.target.value);  // This will be an array of selected values
@@ -19,6 +32,10 @@ function Generate() {
   const handleGenerateReadme = () => {
     // Placeholder logic for generating README content based on repo URL and options
     const optionsText = selectedOptions.join(', ') || 'No additional options selected';
+    // socket.emit('generate-response', ({
+    //   repoURL, optionsText
+    // }))
+
     setGeneratedReadme(`# README for ${repoURL}\n\nThis README is generated with the following options: ${optionsText}`);
   };
 

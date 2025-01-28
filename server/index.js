@@ -67,9 +67,9 @@ io.on('connection', (socket) => {
   logger.info(`New socket connection: ${socket.id} (User: ${socket.user.username})`);
 
   // Custom event example
-  socket.on('message', (data) => {
+  socket.on('generate-request', (data) => {
     logger.info(`Received message from ${socket.user.username}: ${data}`);
-    socket.emit('reply', { message: 'Message received', data });
+    socket.emit('generate-reponse', { message: 'Message received', data });
   });
 
   // Handle disconnect
