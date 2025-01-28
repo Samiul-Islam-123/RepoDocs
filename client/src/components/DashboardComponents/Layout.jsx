@@ -34,6 +34,7 @@ import { IoMdHome } from "react-icons/io"
 import { IoIosSettings } from "react-icons/io"
 import { useNavigate } from "react-router-dom"
 import { CgProfile } from "react-icons/cg";
+import { UserButton } from "@clerk/clerk-react"
 
 
 const drawerWidth = 240
@@ -307,7 +308,9 @@ const Layout = ({ children }) => {
               {mode === "light" ? <Brightness4 /> : <Brightness7 />}
             </IconButton>
 
-            <IconButton
+              <UserButton />
+
+            {/* <IconButton
               size="medium"
               edge="end"
               aria-label="account of current user"
@@ -323,7 +326,7 @@ const Layout = ({ children }) => {
               }}
             >
               <AccountCircle />
-            </IconButton>
+            </IconButton> */}
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton

@@ -9,6 +9,7 @@ function DashboardRoutes() {
   return (
     <>
         <Routes>
+            <Route path='' element={<Home />} />
             <Route path='home' element={<Home />} />
             <Route path='generate' element={<Generate />} />
             <Route path='history' element={<History />} />
