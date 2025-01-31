@@ -8,7 +8,7 @@ function Generate() {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [generatedReadme, setGeneratedReadme] = useState('');
   const { mode } = useThemeContext();
-  const {socket} = useSocket();
+  const {socket, connected} = useSocket();
 
   useEffect(() => {
     if(socket){
@@ -30,14 +30,16 @@ function Generate() {
   };
 
   const handleGenerateReadme = () => {
+    if (connected === true) {
+      console.log(repoURL, selectedOptions);
+      socket.emit("generate-request", { repoURL, selectedOptions });
+    }
+  
     // Placeholder logic for generating README content based on repo URL and options
-    const optionsText = selectedOptions.join(', ') || 'No additional options selected';
-    // socket.emit('generate-response', ({
-    //   repoURL, optionsText
-    // }))
-
+    const optionsText = selectedOptions.join(", ") || "No additional options selected";
     setGeneratedReadme(`# README for ${repoURL}\n\nThis README is generated with the following options: ${optionsText}`);
   };
+  
 
   return (
     <Container sx={{ py: 4 }} maxWidth="lg">

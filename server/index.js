@@ -9,6 +9,7 @@ const ConnectToDatabase = require('./config/dbConfig');
 const getIPAddress = require('./utils/IP');
 const AuthRouter = require('./routes/AuthRouter');
 const jwt = require('jsonwebtoken'); // For handling JWTs
+const { ExecutePrompt } = require('./utils/Generator');
 
 // Initialize Express app
 const app = express();
@@ -67,9 +68,11 @@ io.on('connection', (socket) => {
   logger.info(`New socket connection: ${socket.id} (User: ${socket.user.username})`);
 
   // Custom event example
-  socket.on('generate-request', (data) => {
-    logger.info(`Received message from ${socket.user.username}: ${data}`);
-    socket.emit('generate-reponse', { message: 'Message received', data });
+  socket.on('generate-request', async(data) => {
+    const dataString = typeof data === 'object' ? JSON.stringify(data) : data.toString();
+     await ExecutePrompt(dataString, socket);
+    //logger.info(`Received message from ${socket.user.username}: ${dataString}`);
+    socket.emit('generate-reponse', { status: 'completed' });
   });
 
   // Handle disconnect
