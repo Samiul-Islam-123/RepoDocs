@@ -1,144 +1,291 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, Paper } from '@mui/material';
+import { 
+  Grid, 
+  Box, 
+  Container, 
+  Typography, 
+  TextField, 
+  Button, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  Checkbox, 
+  ListItemText, 
+  Paper,
+  Chip,
+  FormHelperText,
+  CircularProgress,
+  IconButton,
+  Tooltip
+} from '@mui/material';
 import { useThemeContext } from '../../context/ThemeContext';
 import { useSocket } from '../../context/SocketContext';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Preview, Edit, Settings, ContentCopy } from '@mui/icons-material';
 
 function Generate() {
   const [repoURL, setRepoURL] = useState('');
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const [customInstructions, setCustomInstructions] = useState('');
   const [generatedReadme, setGeneratedReadme] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const { mode } = useThemeContext();
-  const {socket, connected} = useSocket();
+  const { socket, connected } = useSocket();
 
   useEffect(() => {
-    if(socket){
-      console.log("Sending request...")
-      socket.emit('generate-request', ('sample data :)'))
-
-      socket.on('generate-reponse', data => {
-        console.log(data)
-      })
+    if (socket) {
+      socket.on('generate-response', data => {
+        if (data.status === 'pending') {
+          setGeneratedReadme(prev => prev + data.data);
+        }
+        if (data.status === 'completed') {
+          setIsGenerating(false);
+        }
+      });
     }
-  },[socket])
-
-  const handleSelectChange = (event) => {
-    setSelectedOptions(event.target.value);  // This will be an array of selected values
-  };
-
-  const handleRepoURLChange = (event) => {
-    setRepoURL(event.target.value);
-  };
+  }, [socket]);
 
   const handleGenerateReadme = () => {
-    if (connected === true) {
-      console.log(repoURL, selectedOptions);
-      socket.emit("generate-request", { repoURL, selectedOptions });
+    if (connected) {
+      setIsGenerating(true);
+      setGeneratedReadme("")
+      socket.emit("generate-request", { 
+        repoURL, 
+        selectedOptions,
+        customInstructions 
+      });
     }
-  
-    // Placeholder logic for generating README content based on repo URL and options
-    const optionsText = selectedOptions.join(", ") || "No additional options selected";
-    setGeneratedReadme(`# README for ${repoURL}\n\nThis README is generated with the following options: ${optionsText}`);
   };
-  
+
+  const darkMode = mode === 'dark';
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(generatedReadme);
+  };
 
   return (
-    <Container sx={{ py: 4 }} maxWidth="lg">
-      {/* Flexbox Container for Layout */}
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
-        
-        {/* Left Side (Input Section) */}
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            variant="h4"
-            align="center"
-            gutterBottom
-            sx={{ color: mode === 'dark' ? 'white' : 'black' }}
-          >
-            Generate README.md
-          </Typography>
-          <TextField
-            label="GitHub Repo URL"
-            variant="outlined"
-            fullWidth
-            value={repoURL}
-            onChange={handleRepoURLChange}
-            sx={{
-              mb: 2,
-              backgroundColor: mode === 'dark' ? '#333' : 'white',
-              color: mode === 'dark' ? 'white' : 'black',
-              '& .MuiInputLabel-root': {
-                color: mode === 'dark' ? 'white' : 'black'
-              },
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: mode === 'dark' ? 'white' : 'black',
-                },
-              },
-              
-            }}
-          />
-          <FormControl fullWidth sx={{ mb: 4 }}>
-            <InputLabel sx={{ color: mode === 'dark' ? 'white' : 'black' }}>Options</InputLabel>
-            <Select
-              multiple
-              value={selectedOptions}
-              onChange={handleSelectChange}
-              renderValue={(selected) => selected.join(', ')}
-              sx={{
-                backgroundColor: mode === 'dark' ? '#333' : 'white',
-                color: mode === 'dark' ? 'white' : 'black',
-                '& .MuiInputLabel-root': {
-                  color: mode === 'dark' ? 'white' : 'black'
-                },
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: mode === 'dark' ? 'white' : 'black',
-                  },
-                },
+    <Container maxWidth="xl" sx={{ py: 4, height: '100vh' }}>
+      <Grid container spacing={3} sx={{ height: '100%' }}>
+        {/* Configuration Panel */}
+        <Grid item xs={12} md={3} lg={2.5}>
+          <Paper sx={{ 
+            p: 3, 
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: darkMode ? '#1A1A1A' : '#FFF'
+          }}>
+            <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Settings fontSize="small" />
+              <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
+                Configuration
+              </Typography>
+            </Box>
+
+            <TextField
+              fullWidth
+              label="GitHub Repo URL"
+              variant="outlined"
+              value={repoURL}
+              onChange={(e) => setRepoURL(e.target.value)}
+              sx={{ mb: 2 }}
+              InputProps={{
+                sx: {
+                  color: darkMode ? '#FFF' : '#333',
+                  backgroundColor: darkMode ? '#333' : '#FAFAFA'
+                }
+              }}
+            />
+
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Sections</InputLabel>
+              <Select
+                multiple
+                value={selectedOptions}
+                onChange={(e) => setSelectedOptions(e.target.value)}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} size="small" />
+                    ))}
+                  </Box>
+                )}
+              >
+                {['installation', 'usage', 'contributing', 'license'].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <Checkbox checked={selectedOptions.includes(option)} size="small" />
+                    <ListItemText primary={option.charAt(0).toUpperCase() + option.slice(1)} />
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>Select README sections</FormHelperText>
+            </FormControl>
+
+            <TextField
+              fullWidth
+              label="Custom Instructions"
+              variant="outlined"
+              multiline
+              rows={3}
+              value={customInstructions}
+              onChange={(e) => setCustomInstructions(e.target.value)}
+              sx={{ mb: 2 }}
+              InputProps={{
+                sx: {
+                  color: darkMode ? '#FFF' : '#333',
+                  backgroundColor: darkMode ? '#333' : '#FAFAFA'
+                }
+              }}
+              helperText={`${customInstructions.length}/500 characters`}
+            />
+
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleGenerateReadme}
+              disabled={!repoURL || isGenerating}
+              sx={{ 
+                mt: 'auto',
+                py: 1.5,
+                bgcolor: darkMode ? '#4CAF50' : '#2E7D32',
+                '&:hover': {
+                  bgcolor: darkMode ? '#45A049' : '#1B5E20'
+                }
               }}
             >
-              <MenuItem value="installation">
-                <Checkbox checked={selectedOptions.indexOf('installation') > -1} />
-                <ListItemText primary="Installation Instructions" />
-              </MenuItem>
-              <MenuItem value="usage">
-                <Checkbox checked={selectedOptions.indexOf('usage') > -1} />
-                <ListItemText primary="Usage Instructions" />
-              </MenuItem>
-              <MenuItem value="contributing">
-                <Checkbox checked={selectedOptions.indexOf('contributing') > -1} />
-                <ListItemText primary="Contributing Guidelines" />
-              </MenuItem>
-              <MenuItem value="license">
-                <Checkbox checked={selectedOptions.indexOf('license') > -1} />
-                <ListItemText primary="License" />
-              </MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            variant="contained"
-            size="large"
-            sx={{ width: '100%', backgroundColor: mode === 'dark' ? '#555' : '#1976d2' }}
-            onClick={handleGenerateReadme}
-          >
-            Generate README.md
-          </Button>
-        </Box>
+              {isGenerating ? (
+                <CircularProgress size={24} sx={{ color: '#FFF' }} />
+              ) : (
+                'Generate README'
+              )}
+            </Button>
+          </Paper>
+        </Grid>
 
-        {/* Right Side (Output Section) */}
-        {generatedReadme && (
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h5" gutterBottom sx={{ color: mode === 'dark' ? 'white' : 'black' }}>
-              Generated README.md
-            </Typography>
-            <Paper sx={{ p: 2, maxHeight: 300, overflow: 'auto', backgroundColor: mode === 'dark' ? '#444' : 'white' }}>
-              <Typography variant="body1" component="pre" sx={{ whiteSpace: 'pre-wrap', color: mode === 'dark' ? 'white' : 'black' }}>
-                {generatedReadme}
+        {/* Editor Panel */}
+        <Grid item xs={12} md={4} lg={4}>
+          <Paper sx={{ 
+            height: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: darkMode ? '#1A1A1A' : '#FAFAFA'
+          }}>
+            <Box sx={{ 
+              p: 2,
+              borderBottom: `1px solid ${darkMode ? '#333' : '#EEE'}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Edit fontSize="small" />
+                <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
+                  Markdown Editor
+                </Typography>
+              </Box>
+              <Tooltip title="Copy to Clipboard">
+                <IconButton onClick={handleCopyToClipboard} size="small">
+                  <ContentCopy fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            
+            <TextField
+              fullWidth
+              multiline
+              value={generatedReadme}
+              onChange={(e) => setGeneratedReadme(e.target.value)}
+              sx={{
+                flex: 1,
+                '& .MuiInputBase-root': {
+                  height: '80vh',
+                  alignItems: 'flex-start',
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  padding: 2,
+                }
+              }}
+              InputProps={{
+                disableUnderline: true,
+                sx: {
+                  color: darkMode ? '#FFF' : '#333',
+                  '& textarea': {
+                    overflow: 'auto !important',
+                    resize: 'none'
+                  }
+                }
+              }}
+            />
+          </Paper>
+        </Grid>
+
+        {/* Preview Panel */}
+        <Grid item xs={12} md={5} lg={5.5}>
+          <Paper sx={{ 
+            height: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: darkMode ? '#1A1A1A' : '#FAFAFA'
+          }}>
+            <Box sx={{ 
+              p: 2,
+              borderBottom: `1px solid ${darkMode ? '#333' : '#EEE'}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}>
+              <Preview fontSize="small" />
+              <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
+                Live Preview
               </Typography>
-            </Paper>
-          </Box>
-        )}
-      </Box>
+            </Box>
+            
+            <Box sx={{
+              flex: 1,
+              overflow: 'auto',
+              p: 2,
+              color: darkMode ? '#FFF' : '#333',
+              '& h1': { fontSize: '2rem', fontWeight: 600, my: 2 },
+              '& h2': { fontSize: '1.5rem', fontWeight: 500, my: 1.5 },
+              '& code': { 
+                backgroundColor: darkMode ? '#333' : '#EEE',
+                padding: '2px 4px',
+                borderRadius: '4px'
+              },
+              '& pre': {
+                backgroundColor: darkMode ? '#333' : '#EEE',
+                padding: '16px',
+                borderRadius: '8px',
+                overflowX: 'auto'
+              }
+            }}>
+              <ReactMarkdown
+                components={{
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '');
+                    return !inline && match ? (
+                      <SyntaxHighlighter
+                        language={match[1]}
+                        PreTag="div"
+                        children={String(children).replace(/\n$/, '')}
+                        {...props}
+                      />
+                    ) : (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  }
+                }}
+              >
+                {generatedReadme}
+              </ReactMarkdown>
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

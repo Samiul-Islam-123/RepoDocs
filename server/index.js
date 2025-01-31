@@ -9,7 +9,7 @@ const ConnectToDatabase = require('./config/dbConfig');
 const getIPAddress = require('./utils/IP');
 const AuthRouter = require('./routes/AuthRouter');
 const jwt = require('jsonwebtoken'); // For handling JWTs
-const { ExecutePrompt } = require('./utils/Generator');
+const { ExecutePrompt, ExtractInfo, formatRepoInfo } = require('./utils/Generator');
 
 // Initialize Express app
 const app = express();
@@ -68,12 +68,35 @@ io.on('connection', (socket) => {
   logger.info(`New socket connection: ${socket.id} (User: ${socket.user.username})`);
 
   // Custom event example
-  socket.on('generate-request', async(data) => {
+  socket.on('generate-request', async (data) => {
     const dataString = typeof data === 'object' ? JSON.stringify(data) : data.toString();
-     await ExecutePrompt(dataString, socket);
-    //logger.info(`Received message from ${socket.user.username}: ${dataString}`);
-    socket.emit('generate-reponse', { status: 'completed' });
+    logger.info(`Received message from ${socket.user.username}: ${dataString}`);
+  
+    try {
+      const repoInfo = await ExtractInfo(data.repoURL);
+      logger.info('Repository metadata:', repoInfo);
+  
+      // Convert the repo info to a readable string format
+      const repoInfoString = formatRepoInfo(repoInfo);
+  
+      // Prepare the prompt by appending the repo info to the user's prompt
+      const fullPrompt = `You are a professional README writer. Write a README.md file for me . I need only the README.md nothing else
+
+      ${dataString}\n\nHere is the project information:\n${repoInfoString}`;
+  
+      // Execute the prompt with the formatted information
+      await ExecutePrompt(fullPrompt, socket);
+  
+      socket.emit('generate-response', { status: 'completed' });
+      
+    } catch (error) {
+      console.error("Error processing request:", error);
+      socket.emit('generate-response', { status: 'failed', error: error.message });
+    }
   });
+  
+  
+  
 
   // Handle disconnect
   socket.on('disconnect', () => {
