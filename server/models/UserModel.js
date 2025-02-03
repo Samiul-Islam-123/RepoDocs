@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
     timestamp : {
         type : Date,
         default : Date.now
+    },
+    bolts : {
+        type : Number,
+        default : 20
     }
 })
 

@@ -10,6 +10,10 @@ const getIPAddress = require('./utils/IP');
 const AuthRouter = require('./routes/AuthRouter');
 const jwt = require('jsonwebtoken'); // For handling JWTs
 const { ExecutePrompt, ExtractInfo, formatRepoInfo } = require('./utils/Generator');
+const UserModel = require('./models/UserModel');
+const { console } = require('inspector');
+const HistoryModel = require('./models/HistoryModel');
+const HistoryRouter = require('./routes/HistoryRouter');
 
 // Initialize Express app
 const app = express();
@@ -35,6 +39,7 @@ app.get('/', (req, res) => {
 
 // Custom routes
 app.use('/auth', AuthRouter);
+app.use('/history', HistoryRouter)
 
 // Create HTTP server
 const server = http.createServer(app);
@@ -64,39 +69,94 @@ io.use((socket, next) => {
 });
 
 // Handle socket connections
-io.on('connection', (socket) => {
+io.on('connection',async (socket) => {
   logger.info(`New socket connection: ${socket.id} (User: ${socket.user.username})`);
 
-  // Custom event example
+  //generate event
   socket.on('generate-request', async (data) => {
-    const dataString = typeof data === 'object' ? JSON.stringify(data) : data.toString();
-    logger.info(`Received message from ${socket.user.username}: ${dataString}`);
-  
-    try {
-      const repoInfo = await ExtractInfo(data.repoURL);
-      logger.info('Repository metadata:', repoInfo);
-  
-      // Convert the repo info to a readable string format
-      const repoInfoString = formatRepoInfo(repoInfo);
-  
-      // Prepare the prompt by appending the repo info to the user's prompt
-      const fullPrompt = `You are a professional README writer. Write a README.md file for me . I need only the README.md nothing else
+    const startTime = Date.now(); // Capture start time
 
-      ${dataString}\n\nHere is the project information:\n${repoInfoString}`;
-  
-      // Execute the prompt with the formatted information
-      await ExecutePrompt(fullPrompt, socket);
-  
-      socket.emit('generate-response', { status: 'completed' });
-      
+    try {
+        // Deduct bolt
+        let UserData = await UserModel.findOne({ _id: socket.user.id });
+        if(UserData.bolts ===0){
+          socket.emit('generate-response', { status: false,
+            message : "You dont have enought bolts",
+            code : 1
+           })
+           console.log("Hobe na bhai....")
+           return ;
+        }
+        socket.emit('bolts-left', UserData?.bolts);
+
+        console.log(UserData);
+        if (UserData) {
+            UserData.bolts -= process.env.BOLT_CHARGE;
+            await UserData.save();
+            logger.info("Bolts deducted");
+        } else {
+            return socket.emit('generate-response', {
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const dataString = typeof data === 'object' ? JSON.stringify(data) : data.toString();
+        logger.info(`Received message from ${socket.user.username}: ${dataString}`);
+
+        const repoInfo = await ExtractInfo(data.repoURL);
+        logger.info('Repository metadata:', repoInfo);
+
+        // Convert repo info to a readable string format
+        const repoInfoString = formatRepoInfo(repoInfo);
+
+        // Prepare the prompt
+        const fullPrompt = `You are a professional README writer. Write a README.md file for me. I need only the README.md, nothing else.
+        Make the README modern with meaningful emojis, badges, and make it informative. Also, include bash commands if required.
+        ${dataString}\n\nHere is the project information:\n${repoInfoString}`;
+
+        // Execute the prompt
+        await ExecutePrompt(fullPrompt, socket);
+
+        // Emit response
+        socket.emit('generate-response', { status: 'completed' });
+
+        // Fetch updated bolts count
+        UserData = await UserModel.findOne({ _id: socket.user.id });
+        
+        // Log history data in required structure
+        const historyData = {
+          customer: socket.user.id,
+          repoURL: data.repoURL,
+          configuration: JSON.stringify(data), // Store configuration as JSON string
+          timeTaken: Date.now() - startTime, // Calculate execution time
+          boltsCharged: process.env.BOLT_CHARGE,
+          timestamp: new Date(),
+        };
+        
+        const HistoryRecord = new HistoryModel(historyData);
+        await HistoryRecord.save();
+        socket.emit('bolts-left', UserData?.bolts);
+
     } catch (error) {
-      console.error("Error processing request:", error);
-      socket.emit('generate-response', { status: 'failed', error: error.message });
+        console.error("Error processing request:", error);
+        socket.emit('generate-response', { status: 'failed', error: error.message });
+    } finally {
+        // Capture end time and log the execution time
+        const endTime = Date.now();
+        console.log(`Execution time: ${endTime - startTime} ms`);
     }
-  });
-  
-  
-  
+});
+
+
+
+  socket.on('get-bolts', async() => {
+    const UserData = await UserModel.findOne({ _id: socket.user.id });
+    console.log(UserData.bolts)
+      socket.emit('bolts-left', UserData.bolts);
+  })
+
+
 
   // Handle disconnect
   socket.on('disconnect', () => {

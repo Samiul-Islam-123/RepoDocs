@@ -108,6 +108,7 @@ const formatRepoInfo = (repoInfo) => {
 };
 
 const ExecutePrompt = async (prompt, socket) => {
+  //console.log(prompt)
   const result = await model.generateContentStream(prompt);
 
   for await (const chunk of result.stream) {
