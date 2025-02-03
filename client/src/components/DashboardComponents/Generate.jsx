@@ -40,6 +40,20 @@ function Generate() {
         if (data.status === 'pending') {
           setGeneratedReadme(prev => prev + data.data);
         }
+
+        if(data.success === false){
+          alert(data.message);
+          console.log(data)
+          setIsGenerating(false)
+
+          // if(data.code === 1){
+          //   alert("Navigating to buy route")
+          // }
+        }
+
+        
+        
+
         if (data.status === 'completed') {
           setIsGenerating(false);
         }
@@ -50,7 +64,7 @@ function Generate() {
   const handleGenerateReadme = () => {
     if (connected) {
       setIsGenerating(true);
-      setGeneratedReadme("")
+      setGeneratedReadme("");
       socket.emit("generate-request", { 
         repoURL, 
         selectedOptions,
@@ -59,17 +73,17 @@ function Generate() {
     }
   };
 
-  const darkMode = mode === 'dark';
-
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(generatedReadme);
   };
+
+  const darkMode = mode === 'dark';
 
   return (
     <Container maxWidth="xl" sx={{ py: 4, height: '100vh' }}>
       <Grid container spacing={3} sx={{ height: '100%' }}>
         {/* Configuration Panel */}
-        <Grid item xs={12} md={3} lg={2.5}>
+        <Grid item xs={12} md={4} lg={3}>
           <Paper sx={{ 
             p: 3, 
             height: '100%',
@@ -164,125 +178,78 @@ function Generate() {
           </Paper>
         </Grid>
 
-        {/* Editor Panel */}
-        <Grid item xs={12} md={4} lg={4}>
-          <Paper sx={{ 
+        {/* Editor + Preview Panel */}
+        <Grid item xs={12} md={8} lg={9}>
+          <Paper sx={{
             height: '85vh',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: darkMode ? '#1A1A1A' : '#FAFAFA'
           }}>
-            <Box sx={{ 
+            <Box sx={{
               p: 2,
               borderBottom: `1px solid ${darkMode ? '#333' : '#EEE'}`,
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Edit fontSize="small" />
-                <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
-                  Markdown Editor
-                </Typography>
-              </Box>
+              <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
+                Markdown Editor & Preview
+              </Typography>
               <Tooltip title="Copy to Clipboard">
                 <IconButton onClick={handleCopyToClipboard} size="small">
                   <ContentCopy fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>
-            
-            <TextField
-              fullWidth
-              multiline
-              value={generatedReadme}
-              onChange={(e) => setGeneratedReadme(e.target.value)}
-              sx={{
-                flex: 1,
-                '& .MuiInputBase-root': {
-                  height: '80vh',
-                  alignItems: 'flex-start',
-                  fontFamily: 'monospace',
-                  fontSize: '0.875rem',
-                  padding: 2,
-                }
-              }}
-              InputProps={{
-                disableUnderline: true,
-                sx: {
-                  color: darkMode ? '#FFF' : '#333',
-                  '& textarea': {
-                    overflow: 'auto !important',
-                    resize: 'none'
-                  }
-                }
-              }}
-            />
-          </Paper>
-        </Grid>
 
-        {/* Preview Panel */}
-        <Grid item xs={12} md={5} lg={5.5}>
-          <Paper sx={{ 
-            height: '85vh',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: darkMode ? '#1A1A1A' : '#FAFAFA'
-          }}>
-            <Box sx={{ 
-              p: 2,
-              borderBottom: `1px solid ${darkMode ? '#333' : '#EEE'}`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}>
-              <Preview fontSize="small" />
-              <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
-                Live Preview
-              </Typography>
-            </Box>
-            
-            <Box sx={{
-              flex: 1,
-              overflow: 'auto',
-              p: 2,
-              color: darkMode ? '#FFF' : '#333',
-              '& h1': { fontSize: '2rem', fontWeight: 600, my: 2 },
-              '& h2': { fontSize: '1.5rem', fontWeight: 500, my: 1.5 },
-              '& code': { 
-                backgroundColor: darkMode ? '#333' : '#EEE',
-                padding: '2px 4px',
-                borderRadius: '4px'
-              },
-              '& pre': {
-                backgroundColor: darkMode ? '#333' : '#EEE',
-                padding: '16px',
-                borderRadius: '8px',
-                overflowX: 'auto'
-              }
-            }}>
-              <ReactMarkdown
-                components={{
-                  code({ node, inline, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || '');
-                    return !inline && match ? (
-                      <SyntaxHighlighter
-                        language={match[1]}
-                        PreTag="div"
-                        children={String(children).replace(/\n$/, '')}
-                        {...props}
-                      />
-                    ) : (
-                      <code className={className} {...props}>
-                        {children}
-                      </code>
-                    );
-                  }
-                }}
-              >
-                {generatedReadme}
-              </ReactMarkdown>
-            </Box>
+            <Grid container sx={{ flex: 1, overflow: 'hidden' }}>
+              <Grid item xs={12} md={6} sx={{ p: 2, overflowY: 'auto', height: '100%' }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  value={generatedReadme}
+                  onChange={(e) => setGeneratedReadme(e.target.value)}
+                  sx={{
+                    height: '100%',
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem',
+                    p: 2,
+                  }}
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: {
+                      color: darkMode ? '#FFF' : '#333',
+                      '& textarea': {
+                        overflow: 'auto !important',
+                        resize: 'none'
+                      }
+                    }
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6} sx={{ p: 2, overflowY: 'auto', height: '100%' }}>
+                <ReactMarkdown
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      return !inline && match ? (
+                        <SyntaxHighlighter language={match[1]} PreTag="div">
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                  }}
+                >
+                  {generatedReadme}
+                </ReactMarkdown>
+              </Grid>
+            </Grid>
           </Paper>
         </Grid>
       </Grid>

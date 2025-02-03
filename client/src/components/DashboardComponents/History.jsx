@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useThemeContext } from '../../context/ThemeContext';
+import axios from "axios"
+import Cookies from "js-cookie"
 
 function History() {
   // Sample history data (this can be fetched from an API or stored in state)
@@ -21,6 +23,21 @@ function History() {
     },
     // More history entries...
   ]);
+
+  const fetchHistory = async() => {
+    const token = Cookies.get('token');
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/history/`,{
+        headers: {
+          'authorization': `Bearer ${token}`
+        }
+      })
+
+      console.log(response)
+  }
+
+  useEffect(() => {
+    fetchHistory()
+  },[])
 
   const { mode } = useThemeContext();
 

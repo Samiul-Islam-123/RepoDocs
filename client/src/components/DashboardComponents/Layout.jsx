@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Box,
   CssBaseline,
@@ -35,6 +35,7 @@ import { IoIosSettings } from "react-icons/io"
 import { useNavigate } from "react-router-dom"
 import { CgProfile } from "react-icons/cg";
 import { UserButton } from "@clerk/clerk-react"
+import { useSocket } from "../../context/SocketContext"
 
 
 const drawerWidth = 240
@@ -48,6 +49,19 @@ const Layout = ({ children }) => {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const {socket} = useSocket();
+  const [bolts, setBolts] = useState(null);
+
+  useEffect(() => {
+    if(socket){
+      socket.on("bolts-left", (bolts) => {
+        setBolts(bolts);
+        console.log(bolts)
+      })
+
+      socket.emit('get-bolts')
+    }
+  },[socket])
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -97,7 +111,7 @@ const Layout = ({ children }) => {
         <IconButton size="large" color="inherit">
           <SlEnergy />
         </IconButton>
-        <p>16 Bolts Left</p>
+        <p>{bolts} Bolts Left</p>
       </MenuItem>
       <MenuItem>
         <Button
@@ -273,7 +287,7 @@ const Layout = ({ children }) => {
             <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
               <SlEnergy style={{ color: "#FFD700", marginRight: "4px" }} />
               <Typography variant="body1" sx={{ color: "white", fontWeight: 600 }}>
-                16 Bolts Left
+                {bolts} Bolts Left
               </Typography>
             </Box>
 
