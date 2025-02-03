@@ -1,46 +1,46 @@
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
 
-const FeatureCard = ({ icon, title, description, mode }) => {
+const FeatureCard = ({ icon, title, description, mode, delay }) => {
   return (
-    <Card 
-      sx={{ 
-        height: '100%', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        p: 4,
-        background: mode === 'light' ? 'white' : 'background.paper',
-        transition: 'all 0.3s ease-in-out',
-        '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: mode === 'light'
-            ? '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)'
-            : '0 20px 25px -5px rgba(0,0,0,0.3), 0 10px 10px -5px rgba(0,0,0,0.2)',
-        },
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: delay, duration: 0.5 }}
     >
-      <Box sx={{ mb: 3 }}>
-        {icon}
-      </Box>
-      <CardContent sx={{ textAlign: 'center', flexGrow: 1 }}>
-        <Typography 
-          gutterBottom 
-          variant="h5" 
-          component="h2"
-          sx={{ mb: 2 }}
-        >
+      <Box sx={{
+        p: 3,
+        height: '100%',
+        borderRadius: 2,
+        bgcolor: mode === 'light' ? 'background.paper' : 'grey.900',
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': {
+          transform: 'translateY(-5px)',
+          boxShadow: 3,
+        }
+      }}>
+        <Box sx={{ 
+          width: 60,
+          height: 60,
+          borderRadius: 2,
+          bgcolor: 'primary.main',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mb: 2,
+          color: 'white'
+        }}>
+          {icon}
+        </Box>
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
           {title}
         </Typography>
-        <Typography 
-          variant="body1"
-          color="text.secondary"
-          sx={{ lineHeight: 1.7 }}
-        >
+        <Typography variant="body1" color="text.secondary">
           {description}
         </Typography>
-      </CardContent>
-    </Card>
+      </Box>
+    </motion.div>
   );
 };
 
-export default FeatureCard;
+export default FeatureCard; 

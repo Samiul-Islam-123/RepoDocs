@@ -1,47 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useThemeContext } from '../../context/ThemeContext';
-import axios from "axios"
-import Cookies from "js-cookie"
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useSocket } from '../../context/SocketContext';
 
 function History() {
-  // Sample history data (this can be fetched from an API or stored in state)
-  const [history, setHistory] = useState([
-    {
-      date: '2025-01-25 14:30',
-      repoURL: 'https://github.com/user/project1',
-      options: ['installation', 'usage'],
-      timeTaken: '2s',
-      cost: '$0.00'
-    },
-    {
-      date: '2025-01-24 16:45',
-      repoURL: 'https://github.com/user/project2',
-      options: ['contributing', 'license'],
-      timeTaken: '3s',
-      cost: '$0.00'
-    },
-    // More history entries...
-  ]);
+  const {history, setHistory} = useSocket();
+  const {setTotalGenerations} = useSocket();
 
-  const fetchHistory = async() => {
-    const token = Cookies.get('token');
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/history/`,{
-        headers: {
-          'authorization': `Bearer ${token}`
-        }
-      })
+  // const fetchHistory = async () => {
+  //   try {
+  //     const token = Cookies.get('token');
+  //     const response = await axios.get(`${import.meta.env.VITE_API_URL}/history/`, {
+  //       headers: {
+  //         'authorization': `Bearer ${token}`
+  //       }
+  //     });
 
-      console.log(response)
-  }
+  //     if (response.data.success) {
+  //       const formattedHistory = response.data.history.map(entry => ({
+  //         date: new Date(entry.timestamp).toLocaleString(), // Convert to readable date
+  //         repoURL: entry.repoURL,
+  //         options: JSON.parse(entry.configuration)?.selectedOptions || [], // Extract options
+  //         timeTaken: `${(entry.timeTaken / 1000).toFixed(2)}s`, // Convert ms to seconds
+  //         cost: `${(entry.boltsCharged).toFixed(2)} bolts` // Adjust based on real pricing
+  //       }));
 
-  useEffect(() => {
-    fetchHistory()
-  },[])
+  //       setHistory(formattedHistory);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching history:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchHistory();
+  // }, []);
+
+//  useEffect(() => {
+//     setTotalGenerations(history.length)
+//     console.log(history)
+//   },[history]) 
 
   const { mode } = useThemeContext();
 
-  // Define styles based on theme mode
   const tableContainerStyle = {
     backgroundColor: mode === 'dark' ? '#333' : '#fff',
     color: mode === 'dark' ? 'white' : 'black',
@@ -82,9 +85,14 @@ function History() {
             {history.map((entry, index) => (
               <TableRow key={index}>
                 <TableCell sx={tableCellStyle}>{entry.date}</TableCell>
-                <TableCell sx={tableCellStyle}>{entry.repoURL}</TableCell>
-                <TableCell sx={tableCellStyle}>{entry.options.join(', ')}</TableCell>
+                <TableCell sx={tableCellStyle}>
+                  <a href={entry.repoURL} target="_blank" rel="noopener noreferrer" style={{ color: mode === 'dark' ? '#90caf9' : '#1976d2' }}>
+                    {entry.repoURL}
+                  </a>
+                </TableCell>
+                <TableCell sx={tableCellStyle}>{entry.options.length ? entry.options.join(', ') : 'None'}</TableCell>
                 <TableCell sx={tableCellStyle}>{entry.timeTaken}</TableCell>
+                {console.log(entry)}
                 <TableCell sx={tableCellStyle}>{entry.cost}</TableCell>
               </TableRow>
             ))}

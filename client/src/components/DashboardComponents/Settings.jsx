@@ -12,16 +12,21 @@ import {
   Grid,
 } from "@mui/material";
 import { useThemeContext } from "../../context/ThemeContext";
+import { useUser } from "@clerk/clerk-react";
+import { useSocket } from "../../context/SocketContext";
 
 function Settings() {
   const { mode } = useThemeContext();
+  const { user } = useUser();
+  const {bolts, setBolts} = useSocket();
+  const [currentBolts, setCurrentBolts] = useState(150); // Temporary state for demonstration
 
   const initialSettings = {
-    name: "John Doe",
-    username: "johndoe123",
-    email: "johndoe@example.com",
+    username: user.fullName,
+    email: user.primaryEmailAddress?.emailAddress,
     notifications: true,
     darkMode: mode === "dark",
+    avatarURL: user.imageUrl || ""
   };
 
   const [userSettings, setUserSettings] = useState(initialSettings);
@@ -41,6 +46,11 @@ function Settings() {
   const handleCancelEdit = () => {
     setFormData(userSettings);
     setEditMode(false);
+  };
+
+  const handleBuyBolts = (amount) => {
+    // In a real app, this would interface with a payment processor
+    setCurrentBolts(prev => prev + amount);
   };
 
   return (
@@ -63,18 +73,12 @@ function Settings() {
       >
         User Settings
       </Typography>
-      <Typography
-        variant="body1"
-        align="center"
-        sx={{ mb: 4, color: mode === "dark" ? "#aaa" : "#555" }}
-      >
-        Manage your preferences and account settings below.
-      </Typography>
 
-      {/* Profile Information */}
+      {/* Profile and Bolts Purchase */}
       <Grid container spacing={3}>
+        {/* Profile Section (Remains Unchanged) */}
         <Grid item xs={12} sm={6}>
-          <Card
+        <Card
             sx={{
               backgroundColor: mode === "dark" ? "#333" : "#fff",
               boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
@@ -84,7 +88,7 @@ function Settings() {
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={3}>
                 <Avatar
-                  src="https://via.placeholder.com/150"
+                  src={userSettings.avatarURL}
                   alt={userSettings.name}
                   sx={{
                     width: 100,
@@ -121,7 +125,7 @@ function Settings() {
                     >
                       Email: <strong>{userSettings.email}</strong>
                     </Typography>
-                    <Button
+                    {/* <Button
                       variant="outlined"
                       size="small"
                       onClick={() => setEditMode(true)}
@@ -132,7 +136,7 @@ function Settings() {
                       }}
                     >
                       Edit Profile
-                    </Button>
+                    </Button> */}
                   </Box>
                 ) : (
                   <Box
@@ -144,13 +148,7 @@ function Settings() {
                       width: "100%",
                     }}
                   >
-                    <TextField
-                      label="Name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      fullWidth
-                    />
+                    
                     <TextField
                       label="Username"
                       name="username"
@@ -188,7 +186,7 @@ function Settings() {
           </Card>
         </Grid>
 
-        {/* Preferences */}
+        {/* Bolts Purchase Section */}
         <Grid item xs={12} sm={6}>
           <Card
             sx={{
@@ -206,31 +204,112 @@ function Settings() {
                   mb: 2,
                 }}
               >
-                Preferences
+                Bolts Purchase
               </Typography>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography
-                    variant="body1"
-                    sx={{ color: mode === "dark" ? "#aaa" : "#555" }}
-                  >
-                    News letter
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    size="small"
+              
+              <Typography
+                variant="body1"
+                sx={{ 
+                  color: mode === "dark" ? "#aaa" : "#555",
+                  mb: 3,
+                  textAlign: 'center',
+                  fontSize: '1.2rem'
+                }}
+              >
+                Current Bolts: <strong style={{ color: '#ffd700' }}>{bolts} ⚡</strong>
+              </Typography>
+
+              <Grid container spacing={2}>
+                {/* Bolt Package 1 */}
+                <Grid item xs={12} sm={4}>
+                  <Box
                     sx={{
-                      mt: 1,
-                      backgroundColor: userSettings.notifications
-                        ? "#4caf50"
-                        : "#f44336",
+                      p: 2,
+                      border: `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`,
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      '&:hover': {
+                        backgroundColor: mode === 'dark' ? '#444' : '#f5f5f5'
+                      }
                     }}
                   >
-                    {userSettings.notifications ? "Enabled" : "Disabled"}
-                  </Button>
-                </Box>
-                
-              </Stack>
+                    <Typography variant="h6" sx={{ mb: 1 }}>100 Bolts</Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: '#888' }}>$1.99</Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      onClick={() => handleBuyBolts(100)}
+                    >
+                      Buy Now
+                    </Button>
+                  </Box>
+                </Grid>
+
+                {/* Bolt Package 2 */}
+                <Grid item xs={12} sm={4}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      border: `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`,
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      '&:hover': {
+                        backgroundColor: mode === 'dark' ? '#444' : '#f5f5f5'
+                      }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ mb: 1 }}>500 Bolts</Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: '#888' }}>$8.99</Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      onClick={() => handleBuyBolts(500)}
+                    >
+                      Buy Now
+                    </Button>
+                  </Box>
+                </Grid>
+
+                {/* Bolt Package 3 */}
+                <Grid item xs={12} sm={4}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      border: `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`,
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      '&:hover': {
+                        backgroundColor: mode === 'dark' ? '#444' : '#f5f5f5'
+                      }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ mb: 1 }}>1000 Bolts</Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: '#888' }}>$14.99</Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      onClick={() => handleBuyBolts(1000)}
+                    >
+                      Buy Now
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: 2,
+                  color: mode === "dark" ? "#888" : "#666",
+                  textAlign: 'center',
+                  fontStyle: 'italic'
+                }}
+              >
+                * Transactions are secured with SSL encryption
+              </Typography>
             </CardContent>
           </Card>
         </Grid>

@@ -49,8 +49,7 @@ const Layout = ({ children }) => {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const {socket} = useSocket();
-  const [bolts, setBolts] = useState(null);
+  const {socket, bolts, setBolts} = useSocket();
 
   useEffect(() => {
     if(socket){
