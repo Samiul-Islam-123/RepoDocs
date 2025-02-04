@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const fs = require('fs').promises; // Use promises-based fs
 const path = require('path');
 const simpleGit = require('simple-git');
+const Logger = require("./Logger");
 
 dotenv.config();
 // console.log(process.env.GEMINI_API_KEY)
@@ -108,16 +109,24 @@ const formatRepoInfo = (repoInfo) => {
 };
 
 const ExecutePrompt = async (prompt, socket) => {
-  //console.log(prompt)
-  const result = await model.generateContentStream(prompt);
+  try {
+    //console.log(prompt)
+    const result = await model.generateContentStream(prompt);
+    var content = "";
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      content += chunkText;
+      socket.emit('generate-response', {
+        status: "pending",
+        data: chunkText
+      })
+      //process.stdout.write(chunkText);
+    }
 
-  for await (const chunk of result.stream) {
-    const chunkText = chunk.text();
-    socket.emit('generate-response', {
-      status: "pending",
-      data: chunkText
-    })
-    //process.stdout.write(chunkText);
+    return content;
+  }
+  catch (error) {
+    new Logger.error(error)
   }
 }
 

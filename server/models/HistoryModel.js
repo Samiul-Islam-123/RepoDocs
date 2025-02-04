@@ -24,6 +24,9 @@ const HistorySchema = new mongoose.Schema({
         type : Date,
         default : Date.now
     },
+    content : {
+        type : String
+    }
 })
 
 const HistoryModel = new mongoose.model('history', HistorySchema);
