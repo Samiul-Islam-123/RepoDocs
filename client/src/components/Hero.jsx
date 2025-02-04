@@ -138,7 +138,7 @@ const Hero = ({ mode }) => {
           >
             Start Generating
           </Button>
-          <Button 
+          {/* <Button 
             variant="outlined" 
             size="large"
             startIcon={<GitHub />}
@@ -154,7 +154,7 @@ const Hero = ({ mode }) => {
             }}
           >
             View Samples
-          </Button>
+          </Button> */}
         </Box>
       </Box>
     </Container>

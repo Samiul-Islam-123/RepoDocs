@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import Cookies from "js-cookie"
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Replace with your server URL
 const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL;
@@ -64,6 +65,7 @@ export const SocketProvider = ({ children }) => {
       setConnected(false)
     };
   }, []);
+
 
   // useEffect(() => {
   //   setTotalGenerations(history.length)

@@ -18,7 +18,7 @@ const Footer = ({ mode }) => {
             {/* Company Info */}
             <Grid item xs={12} md={4}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
-                README Pro
+                RepoDocs
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Empowering developers with AI-powered documentation solutions.
@@ -37,7 +37,7 @@ const Footer = ({ mode }) => {
               </Box>
             </Grid>
   
-            {/* Resources */}
+            {/* Resources
             <Grid item xs={6} md={2}>
               <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
                 Resources
@@ -47,7 +47,7 @@ const Footer = ({ mode }) => {
                 <li><Link href="#" underline="hover" color="text.secondary">Support</Link></li>
                 <li><Link href="#" underline="hover" color="text.secondary">Contact</Link></li>
               </Box>
-            </Grid>
+            </Grid> */}
   
             {/* Social Media */}
             <Grid item xs={12} md={4}>
@@ -55,13 +55,13 @@ const Footer = ({ mode }) => {
                 Connect With Us
               </Typography>
               <Box sx={{ display: 'flex', gap: 2 }}>
-                <IconButton aria-label="GitHub" color="primary">
+                <IconButton href='https://github.com/Samiul-Islam-123/' aria-label="GitHub" color="primary">
                   <GitHub />
                 </IconButton>
-                <IconButton aria-label="Twitter" color="primary">
+                <IconButton href='https://x.com/Samiul_110' aria-label="Twitter" color="primary">
                   <Twitter />
                 </IconButton>
-                <IconButton aria-label="LinkedIn" color="primary">
+                <IconButton href='https://www.linkedin.com/in/md-samiul-islam-b98475272/' aria-label="LinkedIn" color="primary">
                   <LinkedIn />
                 </IconButton>
               </Box>
