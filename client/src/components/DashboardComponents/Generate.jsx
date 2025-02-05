@@ -70,6 +70,7 @@ function Generate() {
   const navigate = useNavigate();
 
   const handleGenerateReadme = () => {
+    alert('sending generate event')
     if (connected) {
       if(bolts <=0){
         alert("You don't have enough bolts to generate a README")
@@ -193,7 +194,9 @@ function Generate() {
             <Button
               fullWidth
               variant="contained"
-              onClick={handleGenerateReadme}
+              onClick={()=>{
+                handleGenerateReadme();
+              }}
               disabled={!repoURL || isGenerating}
               sx={{ 
                 mt: 'auto',
