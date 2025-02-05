@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const fs = require('fs').promises; // Use promises-based fs
 const path = require('path');
 const simpleGit = require('simple-git');
+const Logger = require("./Logger");
 
 dotenv.config();
 // console.log(process.env.GEMINI_API_KEY)

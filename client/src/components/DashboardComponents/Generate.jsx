@@ -24,6 +24,7 @@ import { useSocket } from '../../context/SocketContext';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { Preview, Edit, Settings, ContentCopy } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 function Generate() {
   const [repoURL, setRepoURL] = useState('');
@@ -32,7 +33,7 @@ function Generate() {
   const [generatedReadme, setGeneratedReadme] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { mode } = useThemeContext();
-  const { socket, connected } = useSocket();
+  const { socket, connected, bolts } = useSocket();
 
   useEffect(() => {
     if (socket) {
@@ -56,13 +57,24 @@ function Generate() {
 
         if (data.status === 'completed') {
           setIsGenerating(false);
+          console.log(generatedReadme, data.historyID);
+          // socket.emit('save-content', {
+          //   content : generatedReadme,
+          //   historyID : data.historyID
+          // })
         }
       });
     }
   }, [socket]);
 
+  const navigate = useNavigate();
+
   const handleGenerateReadme = () => {
     if (connected) {
+      if(bolts <=0){
+        alert("You don't have enough bolts to generate a README")
+        navigate('/')
+      }
       setIsGenerating(true);
       setGeneratedReadme("");
       socket.emit("generate-request", { 
@@ -111,18 +123,31 @@ function Generate() {
                   backgroundColor: darkMode ? '#333' : '#FAFAFA'
                 }
               }}
+              InputLabelProps={{
+                sx: {
+                  color: 'white', // Sets the placeholder (label) color to white
+                  '&.Mui-focused': {
+                    color: 'white', // Keeps label white when focused
+                  },
+                },
+              }}
             />
 
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Sections</InputLabel>
+              <InputLabel sx={{
+                color: darkMode ? '#FFF' : '#333',
+              }}>Sections</InputLabel>
               <Select
                 multiple
+                
                 value={selectedOptions}
                 onChange={(e) => setSelectedOptions(e.target.value)}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => (
-                      <Chip key={value} label={value} size="small" />
+                      <Chip sx={{
+                        color: darkMode ? '#FFF' : '#333',
+                      }} key={value} label={value} size="small" />
                     ))}
                   </Box>
                 )}
@@ -134,7 +159,9 @@ function Generate() {
                   </MenuItem>
                 ))}
               </Select>
-              <FormHelperText>Select README sections</FormHelperText>
+              <FormHelperText sx={{
+                color: darkMode ? '#FFF' : '#333',
+              }}>Select README sections</FormHelperText>
             </FormControl>
 
             <TextField
@@ -151,6 +178,14 @@ function Generate() {
                   color: darkMode ? '#FFF' : '#333',
                   backgroundColor: darkMode ? '#333' : '#FAFAFA'
                 }
+              }}
+              InputLabelProps={{
+                sx: {
+                  color: 'white', // Sets the placeholder (label) color to white
+                  '&.Mui-focused': {
+                    color: 'white', // Keeps label white when focused
+                  },
+                },
               }}
               helperText={`${customInstructions.length}/500 characters`}
             />
@@ -229,7 +264,9 @@ function Generate() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6} sx={{ p: 2, overflowY: 'auto', height: '100%' }}>
+              <Grid item style={{
+                color : mode === 'dark' ? "white" : "black"
+              }} xs={12} md={6} sx={{ p: 2, overflowY: 'auto', height: '100%' }}>
                 <ReactMarkdown
                   components={{
                     code({ node, inline, className, children, ...props }) {

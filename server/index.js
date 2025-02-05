@@ -118,9 +118,7 @@ io.on('connection',async (socket) => {
         // Execute the prompt
         await ExecutePrompt(fullPrompt, socket);
 
-        // Emit response
-        socket.emit('generate-response', { status: 'completed' });
-
+        
         // Fetch updated bolts count
         UserData = await UserModel.findOne({ _id: socket.user.id });
         
@@ -136,6 +134,8 @@ io.on('connection',async (socket) => {
         
         const HistoryRecord = new HistoryModel(historyData);
         await HistoryRecord.save();
+        // Emit response
+        socket.emit('generate-response', { status: 'completed', historyID : HistoryRecord._id });
         socket.emit('bolts-left', UserData?.bolts);
 
     } catch (error) {
@@ -148,6 +148,14 @@ io.on('connection',async (socket) => {
     }
 });
 
+
+socket.on('save-content',async data=>{
+  const Record = await HistoryModel.findById(data.historyID);
+  Record.content = data.content;
+
+  await Record.save();
+  logger.info("Record saved");
+})
 
 
   socket.on('get-bolts', async() => {
