@@ -32,7 +32,6 @@ const Pricing = ({ mode }) => {
 
   return (
     <Box sx={{ py: 12, bgcolor: mode === "light" ? "grey.50" : "background.paper" }}>
-    <Box sx={{ py: 12, bgcolor: mode === "light" ? "grey.50" : "background.paper" }}>
       <Container maxWidth="lg">
         <Typography variant="h2" align="center" gutterBottom sx={{ mb: 8 }}>
           Buy More Bolts
