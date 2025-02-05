@@ -108,7 +108,7 @@ const formatRepoInfo = (repoInfo) => {
 };
 
 const ExecutePrompt = async (prompt, socket) => {
-  //console.log(prompt)
+  console.log(prompt)
   const result = await model.generateContentStream(prompt);
 
   for await (const chunk of result.stream) {
@@ -117,7 +117,7 @@ const ExecutePrompt = async (prompt, socket) => {
       status: "pending",
       data: chunkText
     })
-    //process.stdout.write(chunkText);
+    process.stdout.write(chunkText);
   }
 }
 
