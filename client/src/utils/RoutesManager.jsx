@@ -6,6 +6,7 @@ import Dashboard from '../pages/Dashboard';
 import Signup from '../pages/AuthPages/Signup';
 import Login from '../pages/AuthPages/Login';
 import SaveUserData from './SaveUserdata';
+import PricingPage from '../pages/PricingPage';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -51,6 +52,8 @@ function RoutesManager() {
       <Route exact path="/" element={<LandingPage />} />
       <Route exact path="/signup" element={<Signup />} />
       <Route exact path="/login" element={<Login />} />
+      <Route exact path="/pricing" element={<PricingPage />} />
+      
 
       {/* Protected Routes */}
       <Route

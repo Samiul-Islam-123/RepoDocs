@@ -10,6 +10,9 @@ const Navbar = ({ mode }) => {
     <AppBar position="fixed">
       <Toolbar>
         <Typography 
+        onClick={()=>{
+          navigate('/')
+        }}
           variant="h6" 
           component="div" 
           sx={{ 
