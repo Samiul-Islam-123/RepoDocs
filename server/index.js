@@ -75,7 +75,7 @@ io.on('connection',async (socket) => {
   //generate event
   socket.on('generate-request', async (data) => {
     const startTime = Date.now(); // Capture start time
-
+    console.log('genersting reuqest.......')
     try {
         // Deduct bolt
         let UserData = await UserModel.findOne({ _id: socket.user.id });

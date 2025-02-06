@@ -109,24 +109,16 @@ const formatRepoInfo = (repoInfo) => {
 };
 
 const ExecutePrompt = async (prompt, socket) => {
-  try {
-    //console.log(prompt)
-    const result = await model.generateContentStream(prompt);
-    var content = "";
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      content += chunkText;
-      socket.emit('generate-response', {
-        status: "pending",
-        data: chunkText
-      })
-      //process.stdout.write(chunkText);
-    }
+  console.log(prompt)
+  const result = await model.generateContentStream(prompt);
 
-    return content;
-  }
-  catch (error) {
-    new Logger.error(error)
+  for await (const chunk of result.stream) {
+    const chunkText = chunk.text();
+    socket.emit('generate-response', {
+      status: "pending",
+      data: chunkText
+    })
+    process.stdout.write(chunkText);
   }
 }
 

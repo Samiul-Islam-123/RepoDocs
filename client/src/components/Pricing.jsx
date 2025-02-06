@@ -8,6 +8,10 @@ const Pricing = ({ mode }) => {
       price: "$2.99",
       bolts: "20 Bolts",
       features: ["20 Bolt Credits", "Instant Delivery", "No Expiry"],
+      title: "Starter Pack",
+      price: "$2.99",
+      bolts: "20 Bolts",
+      features: ["20 Bolt Credits", "Instant Delivery", "No Expiry"],
       isPopular: false,
     },
     {
@@ -31,17 +35,6 @@ const Pricing = ({ mode }) => {
       <Container maxWidth="lg">
         <Typography variant="h2" align="center" gutterBottom sx={{ mb: 8 }}>
           Buy More Bolts
-        </Typography>
-        <Typography 
-          variant="h5" 
-          align="center" 
-          sx={{ 
-            mb: 8,
-            color: mode === 'dark' ? 'text.secondary' : 'text.secondary',
-            fontStyle: 'italic'
-          }}
-        >
-          Each README generation costs 2 bolts ⚡
         </Typography>
         <Grid container spacing={4}>
           {pricing.map((plan, index) => (

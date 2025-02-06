@@ -297,7 +297,7 @@ function Home() {
           gap: 1.5
         }}>
           <Bolt sx={{ color: "#FFD700", fontSize: "1.5rem" }} />
-          Each generation uses 1 Bolt
+          Each generation uses 2 Bolt
           <Bolt sx={{ color: "#FFD700", fontSize: "1.5rem" }} />
         </Typography>
       </Box>
