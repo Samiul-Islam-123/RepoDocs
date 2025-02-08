@@ -14,6 +14,9 @@ const UserModel = require('./models/UserModel');
 const { console } = require('inspector');
 const HistoryModel = require('./models/HistoryModel');
 const HistoryRouter = require('./routes/HistoryRouter');
+const PaymentRouter = require('./routes/PaymentRouter');
+const { SessionCompletedWebHook } = require('./controller/PaymentController');
+const APIRouter = require('./routes/APIRouter');
 
 // Initialize Express app
 const app = express();
@@ -22,12 +25,16 @@ const PORT = process.env.PORT || 5500;
 // Logger instance
 const logger = new Logger();
 
+app.use('/payment/webhook', express.raw({ type: 'application/json' }), SessionCompletedWebHook);
+
 // Middleware
 app.use(express.json());
 app.use(cors());
 
 // Load environment variables
 dotenv.config();
+
+
 
 // Basic route
 app.get('/', (req, res) => {
@@ -39,7 +46,9 @@ app.get('/', (req, res) => {
 
 // Custom routes
 app.use('/auth', AuthRouter);
-app.use('/history', HistoryRouter)
+app.use('/history', HistoryRouter);
+app.use('/payment', PaymentRouter);
+app.use('/api',APIRouter)
 
 // Create HTTP server
 const server = http.createServer(app);
