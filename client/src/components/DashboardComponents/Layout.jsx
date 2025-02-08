@@ -114,18 +114,21 @@ const Layout = ({ children }) => {
       </MenuItem>
       <MenuItem>
         <Button
+        onClick={() => {
+          navigate('/pricing')
+        }}
           variant="contained"
           size="small"
           startIcon={<SlEnergy />}
           sx={{
-            background: "rgba(255,255,255,0.2)",
-            color: "white",
+            backgroundColor: mode === 'dark' ? 'primaryDark' : 'primaryLight',
+            color: mode === 'dark' ? 'white' : 'black',
             fontWeight: 600,
-            "&:hover": {
-              background: "rgba(255,255,255,0.3)",
-            },
-            borderRadius: "20px",
+            borderRadius: '20px',
             px: 2,
+            '&:hover': {
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
           }}
         >
           Buy Bolts
@@ -291,6 +294,9 @@ const Layout = ({ children }) => {
             </Box>
 
             <Button
+            onClick={() => {
+              navigate('/pricing')
+            }}
               variant="contained"
               size="medium"
               startIcon={<SlEnergy />}

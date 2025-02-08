@@ -74,7 +74,7 @@ function Generate() {
     if (connected) {
       if(bolts <=0){
         alert("You don't have enough bolts to generate a README")
-        navigate('/')
+        navigate('/pricing')
       }
       setIsGenerating(true);
       setGeneratedReadme("");
@@ -105,7 +105,9 @@ function Generate() {
             backgroundColor: darkMode ? '#1A1A1A' : '#FFF'
           }}>
             <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Settings fontSize="small" />
+              <Settings sx={{
+                color : mode === 'dark' ? "white" : "black"
+              }} fontSize="small" />
               <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
                 Configuration
               </Typography>
@@ -117,16 +119,16 @@ function Generate() {
               variant="outlined"
               value={repoURL}
               onChange={(e) => setRepoURL(e.target.value)}
-              sx={{ mb: 2 }}
+              sx={{ mb: 2 ,}}
               InputProps={{
                 sx: {
-                  color: darkMode ? '#FFF' : '#333',
+                  color: darkMode ? 'white' : 'black',
                   backgroundColor: darkMode ? '#333' : '#FAFAFA'
                 }
               }}
               InputLabelProps={{
                 sx: {
-                  color: 'white', // Sets the placeholder (label) color to white
+                  color: darkMode ? 'white' : 'black', // Sets the placeholder (label) color to white
                   '&.Mui-focused': {
                     color: 'white', // Keeps label white when focused
                   },
@@ -173,7 +175,9 @@ function Generate() {
               rows={3}
               value={customInstructions}
               onChange={(e) => setCustomInstructions(e.target.value)}
-              sx={{ mb: 2 }}
+              sx={{ mb: 2 ,
+                color : mode === 'dark' ? "white" : "black"
+              }}
               InputProps={{
                 sx: {
                   color: darkMode ? '#FFF' : '#333',
@@ -182,14 +186,20 @@ function Generate() {
               }}
               InputLabelProps={{
                 sx: {
-                  color: 'white', // Sets the placeholder (label) color to white
+                  color: mode === 'dark' ? "white" : "black", // Sets the placeholder (label) color to white
                   '&.Mui-focused': {
                     color: 'white', // Keeps label white when focused
                   },
                 },
               }}
-              helperText={`${customInstructions.length}/500 characters`}
+               helperText={`${customInstructions.length}/500 characters`}
+               FormHelperTextProps={{
+                sx: {
+                  color: mode === 'dark' ? '#FFF' : '#333',
+                },
+              }}
             />
+              
 
             <Button
               fullWidth
@@ -236,7 +246,9 @@ function Generate() {
               </Typography>
               <Tooltip title="Copy to Clipboard">
                 <IconButton onClick={handleCopyToClipboard} size="small">
-                  <ContentCopy fontSize="small" />
+                  <ContentCopy sx={{
+                    color: darkMode ? '#FFF' : '#333',
+                  }} fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>
