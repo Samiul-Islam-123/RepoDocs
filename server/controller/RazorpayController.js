@@ -16,6 +16,7 @@ const CreateOrder = async(req,res) => {
             receipt: "order_rcptid_" + Math.floor(Math.random() * 1000),
         };
 
+
         const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (error) {

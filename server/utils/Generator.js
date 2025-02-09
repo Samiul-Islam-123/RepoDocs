@@ -111,15 +111,18 @@ const formatRepoInfo = (repoInfo) => {
 const ExecutePrompt = async (prompt, socket) => {
   //console.log(prompt)
   const result = await model.generateContentStream(prompt);
-
+  var final_output = "";
   for await (const chunk of result.stream) {
     const chunkText = chunk.text();
     socket.emit('generate-response', {
       status: "pending",
       data: chunkText
     })
+    final_output += chunkText;
     //process.stdout.write(chunkText);
   }
+
+  return final_output;
 }
 
 module.exports = { ExecutePrompt, ExtractInfo, formatRepoInfo };

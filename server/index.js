@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
 app.use('/auth', AuthRouter);
 app.use('/history', HistoryRouter);
 app.use('/payment', PaymentRouter);
-app.use('/api',APIRouter)
+app.use('/api', APIRouter)
 
 // Create HTTP server
 const server = http.createServer(app);
@@ -78,7 +78,7 @@ io.use((socket, next) => {
 });
 
 // Handle socket connections
-io.on('connection',async (socket) => {
+io.on('connection', async (socket) => {
   logger.info(`New socket connection: ${socket.id} (User: ${socket.user.username})`);
 
   //generate event
@@ -86,91 +86,96 @@ io.on('connection',async (socket) => {
     const startTime = Date.now(); // Capture start time
     console.log('genersting reuqest.......')
     try {
-        // Deduct bolt
-        let UserData = await UserModel.findOne({ _id: socket.user.id });
-        if(UserData.bolts ===0){
-          socket.emit('generate-response', { status: false,
-            message : "You dont have enought bolts",
-            code : 1
-           })
-           console.log("Hobe na bhai....")
-           return ;
-        }
-        socket.emit('bolts-left', UserData?.bolts);
+      // Deduct bolt
+      let UserData = await UserModel.findOne({ _id: socket.user.id });
+      if (UserData.bolts === 0) {
+        socket.emit('generate-response', {
+          status: false,
+          message: "You dont have enought bolts",
+          code: 1
+        })
+        console.log("Hobe na bhai....")
+        return;
+      }
+      socket.emit('bolts-left', UserData?.bolts);
 
-        console.log(UserData);
-        if (UserData) {
-            UserData.bolts -= process.env.BOLT_CHARGE;
-            await UserData.save();
-            logger.info("Bolts deducted");
-        } else {
-            return socket.emit('generate-response', {
-                success: false,
-                message: "User not found",
-            });
-        }
+      //console.log(UserData);
 
-        const dataString = typeof data === 'object' ? JSON.stringify(data) : data.toString();
-        logger.info(`Received message from ${socket.user.username}: ${dataString}`);
 
-        const repoInfo = await ExtractInfo(data.repoURL);
-        logger.info('Repository metadata:', repoInfo);
+      const dataString = typeof data === 'object' ? JSON.stringify(data) : data.toString();
+      logger.info(`Received message from ${socket.user.username}: ${dataString}`);
 
-        // Convert repo info to a readable string format
-        const repoInfoString = formatRepoInfo(repoInfo);
+      const repoInfo = await ExtractInfo(data.repoURL);
+      logger.info('Repository metadata:', repoInfo);
 
-        // Prepare the prompt
-        const fullPrompt = `You are a professional README writer. Write a README.md file for me. I need only the README.md, nothing else.
+      // Convert repo info to a readable string format
+      const repoInfoString = formatRepoInfo(repoInfo);
+
+      // Prepare the prompt
+      const fullPrompt = `You are a professional README writer. Write a README.md file for me. I need only the README.md, nothing else.
         Make the README modern with meaningful emojis, badges, and make it informative. Also, include bash commands if required.
         ${dataString}\n\nHere is the project information:\n${repoInfoString}`;
 
-        // Execute the prompt
-        await ExecutePrompt(fullPrompt, socket);
+      // Execute the prompt
+      var content = await ExecutePrompt(fullPrompt, socket);
 
-        
-        // Fetch updated bolts count
-        UserData = await UserModel.findOne({ _id: socket.user.id });
-        
-        // Log history data in required structure
-        const historyData = {
-          customer: socket.user.id,
-          repoURL: data.repoURL,
-          configuration: JSON.stringify(data), // Store configuration as JSON string
-          timeTaken: Date.now() - startTime, // Calculate execution time
-          boltsCharged: process.env.BOLT_CHARGE,
-          timestamp: new Date(),
-        };
-        
-        const HistoryRecord = new HistoryModel(historyData);
-        await HistoryRecord.save();
-        // Emit response
-        socket.emit('generate-response', { status: 'completed', historyID : HistoryRecord._id });
-        socket.emit('bolts-left', UserData?.bolts);
+      console.log(content)
+
+      // Fetch updated bolts count
+      UserData = await UserModel.findOne({ _id: socket.user.id });
+
+      // Log history data in required structure
+      const historyData = {
+        customer: socket.user.id,
+        repoURL: data.repoURL,
+        configuration: JSON.stringify(data), // Store configuration as JSON string
+        timeTaken: Date.now() - startTime, // Calculate execution time
+        boltsCharged: process.env.BOLT_CHARGE,
+        timestamp: new Date(),
+        content: content
+      };
+
+      const HistoryRecord = new HistoryModel(historyData);
+      await HistoryRecord.save();
+
+      if (UserData) {
+        UserData.bolts -= process.env.BOLT_CHARGE;
+        await UserData.save();
+        logger.info("Bolts deducted");
+      } else {
+        return socket.emit('generate-response', {
+          success: false,
+          message: "User not found",
+        });
+      }
+      // Emit response
+      socket.emit('generate-response', { status: 'completed', historyID: HistoryRecord._id });
+      socket.emit('bolts-left', UserData?.bolts);
 
     } catch (error) {
-        console.error("Error processing request:", error);
-        socket.emit('generate-response', { status: 'failed', error: error.message });
+      console.error("Error processing request:", error);
+      socket.emit('generate-response', { status: 'failed', error: error.message });
     } finally {
-        // Capture end time and log the execution time
-        const endTime = Date.now();
-        console.log(`Execution time: ${endTime - startTime} ms`);
+      // Capture end time and log the execution time
+      const endTime = Date.now();
+      console.log(`Execution time: ${endTime - startTime} ms`);
     }
-});
+  });
 
 
-socket.on('save-content',async data=>{
-  const Record = await HistoryModel.findById(data.historyID);
-  Record.content = data.content;
+  socket.on('save-content', async data => {
+    const Record = await HistoryModel.findById(data.historyID);
+    Record.content = data.content;
 
-  await Record.save();
-  logger.info("Record saved");
-})
+    await Record.save();
+    logger.info("Record saved");
+  })
 
 
-  socket.on('get-bolts', async() => {
+  socket.on('get-bolts', async () => {
     const UserData = await UserModel.findOne({ _id: socket.user.id });
     console.log(UserData.bolts)
-      socket.emit('bolts-left', UserData.bolts);
+    socket.emit('bolts-left', UserData.bolts);
   })
 
 
