@@ -33,7 +33,8 @@ export const SocketProvider = ({ children }) => {
           repoURL: entry.repoURL,
           options: JSON.parse(entry.configuration)?.selectedOptions || [], // Extract options
           timeTaken: `${(entry.timeTaken / 1000).toFixed(2)}s`, // Convert ms to seconds
-          cost: `${(entry.boltsCharged).toFixed(2)} bolts` // Adjust based on real pricing
+          cost: `${(entry.boltsCharged).toFixed(2)} bolts` ,// Adjust based on real pricing,
+          content : entry.content
         }));
 
         setHistory(formattedHistory);
@@ -66,14 +67,13 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
-
   // useEffect(() => {
   //   setTotalGenerations(history.length)
   //   console.log(history)
   // },[history])
 
   return (
-    <SocketContext.Provider value={{socket, connected, bolts,setBolts, totalGenerations, setTotalGenerations, history, setHistory}}>
+    <SocketContext.Provider value={{socket, connected, bolts,setBolts, totalGenerations, setTotalGenerations, history, setHistory, fetchHistory}}>
       {children}
     </SocketContext.Provider>
   );

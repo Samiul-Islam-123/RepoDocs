@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Grid, 
-  Box, 
-  Container, 
-  Typography, 
-  TextField, 
-  Button, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Checkbox, 
-  ListItemText, 
+import {
+  Grid,
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
+  ListItemText,
   Paper,
   Chip,
   FormHelperText,
@@ -25,6 +25,8 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { Preview, Edit, Settings, ContentCopy } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from "js-cookie"
 
 function Generate() {
   const [repoURL, setRepoURL] = useState('');
@@ -33,7 +35,8 @@ function Generate() {
   const [generatedReadme, setGeneratedReadme] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { mode } = useThemeContext();
-  const { socket, connected, bolts } = useSocket();
+  const { socket, connected, bolts, fetchHistory } = useSocket();
+  const [currentHistoryID, setCurrentHistoryID] = useState(null);
 
   useEffect(() => {
     if (socket) {
@@ -42,7 +45,7 @@ function Generate() {
           setGeneratedReadme(prev => prev + data.data);
         }
 
-        if(data.success === false){
+        if (data.success === false) {
           alert(data.message);
           console.log(data)
           setIsGenerating(false)
@@ -52,12 +55,15 @@ function Generate() {
           // }
         }
 
-        
-        
+
+
 
         if (data.status === 'completed') {
           setIsGenerating(false);
-          console.log(generatedReadme, data.historyID);
+          //console.log(generatedReadme, data.historyID);
+          setCurrentHistoryID(data.historyID);
+          fetchHistory();
+
           // socket.emit('save-content', {
           //   content : generatedReadme,
           //   historyID : data.historyID
@@ -67,21 +73,49 @@ function Generate() {
     }
   }, [socket]);
 
+  const uploadContent = async (content, currentHistoryID) => {
+    const token = Cookies.get('token');
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/upload-content`, {
+      content: content,
+      historyID: currentHistoryID
+    },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log(response)
+
+    if (response.data.success === false)
+      alert(response.data.message)
+  }
+
+  useEffect(() => {
+    if (isGenerating === false && generatedReadme && currentHistoryID != null) {
+      console.log(generatedReadme, currentHistoryID)
+      uploadContent(generatedReadme, currentHistoryID)
+      setCurrentHistoryID(null)
+    }
+  }, [isGenerating])
+
   const navigate = useNavigate();
 
   const handleGenerateReadme = () => {
-    alert('sending generate event')
+    //alert('sending generate event')
     if (connected) {
-      if(bolts <=0){
+      if (bolts <= 0) {
         alert("You don't have enough bolts to generate a README")
         navigate('/pricing')
       }
       setIsGenerating(true);
       setGeneratedReadme("");
-      socket.emit("generate-request", { 
-        repoURL, 
+      socket.emit("generate-request", {
+        repoURL,
         selectedOptions,
-        customInstructions 
+        customInstructions
       });
     }
   };
@@ -97,8 +131,8 @@ function Generate() {
       <Grid container spacing={3} sx={{ height: '100%' }}>
         {/* Configuration Panel */}
         <Grid item xs={12} md={4} lg={3}>
-          <Paper sx={{ 
-            p: 3, 
+          <Paper sx={{
+            p: 3,
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -106,7 +140,7 @@ function Generate() {
           }}>
             <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
               <Settings sx={{
-                color : mode === 'dark' ? "white" : "black"
+                color: mode === 'dark' ? "white" : "black"
               }} fontSize="small" />
               <Typography variant="h6" sx={{ color: darkMode ? '#FFF' : '#333' }}>
                 Configuration
@@ -119,7 +153,7 @@ function Generate() {
               variant="outlined"
               value={repoURL}
               onChange={(e) => setRepoURL(e.target.value)}
-              sx={{ mb: 2 ,}}
+              sx={{ mb: 2, }}
               InputProps={{
                 sx: {
                   color: darkMode ? 'white' : 'black',
@@ -142,7 +176,7 @@ function Generate() {
               }}>Sections</InputLabel>
               <Select
                 multiple
-                
+
                 value={selectedOptions}
                 onChange={(e) => setSelectedOptions(e.target.value)}
                 renderValue={(selected) => (
@@ -175,8 +209,9 @@ function Generate() {
               rows={3}
               value={customInstructions}
               onChange={(e) => setCustomInstructions(e.target.value)}
-              sx={{ mb: 2 ,
-                color : mode === 'dark' ? "white" : "black"
+              sx={{
+                mb: 2,
+                color: mode === 'dark' ? "white" : "black"
               }}
               InputProps={{
                 sx: {
@@ -192,23 +227,23 @@ function Generate() {
                   },
                 },
               }}
-               helperText={`${customInstructions.length}/500 characters`}
-               FormHelperTextProps={{
+              helperText={`${customInstructions.length}/500 characters`}
+              FormHelperTextProps={{
                 sx: {
                   color: mode === 'dark' ? '#FFF' : '#333',
                 },
               }}
             />
-              
+
 
             <Button
               fullWidth
               variant="contained"
-              onClick={()=>{
+              onClick={() => {
                 handleGenerateReadme();
               }}
               disabled={!repoURL || isGenerating}
-              sx={{ 
+              sx={{
                 mt: 'auto',
                 py: 1.5,
                 bgcolor: darkMode ? '#4CAF50' : '#2E7D32',
@@ -280,7 +315,7 @@ function Generate() {
               </Grid>
 
               <Grid item style={{
-                color : mode === 'dark' ? "white" : "black"
+                color: mode === 'dark' ? "white" : "black"
               }} xs={12} md={6} sx={{ p: 2, overflowY: 'auto', height: '100%' }}>
                 <ReactMarkdown
                   components={{

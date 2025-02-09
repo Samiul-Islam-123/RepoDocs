@@ -43,7 +43,7 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
       // else
       // alert(response.data.message)
 
-
+      //alert(price)
       const orderResponse = await fetch(`${import.meta.env.VITE_API_URL}/payment/razorpay-order`, {
         method: 'POST',
         headers: {
@@ -88,9 +88,10 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
               alert('Payment successful!');
               //api to update bolts
               const token = Cookies.get('token');
+
               const UpdateResponse = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/bolt-pack`,
-                { boltPack: bolts },  // Request body
+                { boltPack: parseInt(bolts.match(/\d+/)[0], 10) },  // Request body
                 {
                   headers: {  // Headers go here
                     'Content-Type': 'application/json',
@@ -98,6 +99,9 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
                   }
                 }
               );
+
+              console.log(UpdateResponse)
+              alert(UpdateResponse.message)
 
             } else {
               alert('Payment verification failed!');

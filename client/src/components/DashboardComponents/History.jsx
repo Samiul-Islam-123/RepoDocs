@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Box, 
   Container, 
@@ -30,6 +30,10 @@ function History() {
   const { mode } = useThemeContext();
   const [selectedContent, setSelectedContent] = useState(null);
   const [openPreview, setOpenPreview] = useState(false);
+
+  useEffect(() => {
+    console.log(history)
+  },[history])
 
   const handlePreviewOpen = (content) => {
     setSelectedContent(content);
@@ -135,7 +139,7 @@ function History() {
               <TableCell sx={headerCellStyle}>Options</TableCell>
               <TableCell sx={headerCellStyle}>Time Taken</TableCell>
               <TableCell sx={headerCellStyle}>Cost</TableCell>
-              {/* <TableCell sx={headerCellStyle}>Preview</TableCell> */}
+              <TableCell sx={headerCellStyle}>Preview</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -157,15 +161,18 @@ function History() {
                 </TableCell>
                 <TableCell sx={tableCellStyle}>{entry.timeTaken}</TableCell>
                 <TableCell sx={tableCellStyle}>{entry.cost}</TableCell>
-                {/* <TableCell sx={tableCellStyle}>
+                <TableCell sx={tableCellStyle}>
                   <Button
                     variant="outlined"
                     color="primary"
-                    onClick={() => handlePreviewOpen(entry.content)}
+                    onClick={() => {
+                      //console.log(entry)
+                       handlePreviewOpen(entry.content)
+                    }}
                   >
                     Preview
                   </Button>
-                </TableCell> */}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
