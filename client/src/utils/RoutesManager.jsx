@@ -50,8 +50,8 @@ function RoutesManager() {
     <Routes>
       {/* Public Routes */}
       <Route exact path="/" element={<LandingPage />} />
-      <Route exact path="/signup" element={<Signup />} />
-      <Route exact path="/login" element={<Login />} />
+      <Route exact path="/signup/*" element={<Signup />} />
+      <Route exact path="/login/*" element={<Login />} />
       <Route exact path="/pricing" element={<PricingPage />} />
       
 
