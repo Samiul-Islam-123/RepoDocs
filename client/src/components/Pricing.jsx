@@ -13,7 +13,7 @@ const Pricing = ({ mode }) => {
   const [pricing, setPricing] = useState([]);
 
   const basePricing = [
-    { title: "Starter Pack", price: 2.99, bolts: "20 Bolts", features: ["20 Bolt Credits", "Instant Delivery", "No Expiry"], isPopular: false },
+    { title: "Starter Pack", price: 0.1, bolts: "20 Bolts", features: ["20 Bolt Credits", "Instant Delivery", "No Expiry"], isPopular: false },
     { title: "Pro Pack", price: 6.99, bolts: "50 Bolts", features: ["50 Bolt Credits", "Best Value", "No Expiry"], isPopular: true },
     { title: "Mega Pack", price: 17.99, bolts: "150 Bolts", features: ["150 Bolt Credits", "Bulk Discount", "No Expiry"], isPopular: false },
   ];
