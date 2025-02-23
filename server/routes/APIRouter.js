@@ -1,6 +1,7 @@
 const authenticateToken = require('../middlewares/authmiddleware');
 const FeedbackModel = require('../models/FeedbackModel');
 const HistoryModel = require('../models/HistoryModel');
+const PricingModel = require('../models/PricingMode');
 const UserModel = require('../models/UserModel');
 const Logger = require('../utils/Logger');
 
@@ -95,6 +96,37 @@ APIRouter.post('/feedback', authenticateToken, async (req, res) => {
             message: error.message
         })
     }
+})
+
+APIRouter.post('/upload-pricing', async (req, res) => {
+    try {
+        const { title, price, bolts, features, isPopular } = req.body;
+        
+        if (!title || !price || !bolts || !features) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+        
+        const newPricing = new Pricing({
+            title,
+            price,
+            bolts,
+            features,
+            isPopular: isPopular || false,
+        });
+
+        await newPricing.save();
+        res.status(201).json({ message: "Pricing plan uploaded successfully", data: newPricing });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
+APIRouter.get('/get-pricing', async(req,res) => {
+    const Pricing = await PricingModel.find();
+    res.json({
+        success : true,
+        pricing : Pricing
+    });
 })
 
 module.exports = APIRouter;
