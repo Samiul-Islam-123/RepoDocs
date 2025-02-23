@@ -15,7 +15,7 @@ jobs:
 
       - name: Copy latest code to /var/www/RepoDocs
         run: |
-          sudo rsync -av --delete ${{ github.workspace }}/ /var/www/RepoDocs
+          sudo rsync -av --delete --exclude=".env" ${{ github.workspace }}/ /var/www/RepoDocs
           cd /var/www/RepoDocs
 
       - name: Install backend
