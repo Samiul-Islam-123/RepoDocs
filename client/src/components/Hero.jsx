@@ -82,7 +82,7 @@ const Hero = ({ mode }) => {
             }
           }}
         >
-          <span>Perfect READMEs Mushi Mushi</span><br />
+          <span>Perfect READMEs</span><br />
           <Box sx={{
             display: 'flex',
             justifyContent: 'center',
