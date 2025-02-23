@@ -11,11 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Action to checkout your repository
+        uses: actions/checkout@v2
+
+      - name: Copy latest code to /var/www
+        run: |
+          sudo rsync -av --delete ${{ github.workspace }}/ /var/www/
+          cd /var/www
 
       - name: Install backend
         run: |
-          cd server
+          cd /var/www/server
           npm install
 
       - name: Restart backend in pm2
@@ -24,7 +29,7 @@ jobs:
 
       - name: Install and build Frontend
         run: |
-          cd client
+          cd /var/www/client
           npm install
           npm run build
 
