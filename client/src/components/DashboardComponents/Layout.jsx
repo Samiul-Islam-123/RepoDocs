@@ -52,15 +52,21 @@ const Layout = ({ children }) => {
   const {socket, bolts, setBolts} = useSocket();
 
   useEffect(() => {
-    if(socket){
+    if (socket) {
       socket.on("bolts-left", (bolts) => {
         setBolts(bolts);
-        console.log(bolts)
-      })
-
-      socket.emit('get-bolts')
+        console.log(bolts);
+      });
+      
+      socket.emit("get-bolts");
+  
+      // Cleanup function to remove event listener when socket changes
+      return () => {
+        socket.off("bolts-left");
+      };
     }
-  },[socket])
+  }, [socket]); // Runs on first render & whenever socket changes
+  
 
   const handleDrawerToggle = () => {
     setOpen(!open)
