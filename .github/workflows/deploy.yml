@@ -13,14 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Copy latest code to /var/www
+      - name: Copy latest code to /var/www/RepoDocs
         run: |
           sudo rsync -av --delete ${{ github.workspace }}/ /var/www/RepoDocs
           cd /var/www/RepoDocs
 
       - name: Install backend
         run: |
-          cd /var/www/server
+          cd /var/www/RepoDocs/server
           npm install
 
       - name: Restart backend in pm2
@@ -29,7 +29,7 @@ jobs:
 
       - name: Install and build Frontend
         run: |
-          cd /var/www/client
+          cd /var/www/RepoDocs/client
           npm install
           npm run build
 
