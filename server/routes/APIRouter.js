@@ -40,6 +40,23 @@ APIRouter.post('/bolt-pack', authenticateToken, async (req, res) => {
     }
 });
 
+APIRouter.get('/pricing', async(req,res) => {
+    try{
+        const data = await PricingModel.find();
+        res.json({
+            pricing : data,
+            success : true
+        })
+    }
+    catch(error){
+        logger.error(error);
+        res.json({
+            message : error.message,
+            success : false
+        })
+    }
+})
+
 APIRouter.post('/upload-content', authenticateToken, async (req, res) => {
     // const userID = req.user.id;
     console.log(req.user)

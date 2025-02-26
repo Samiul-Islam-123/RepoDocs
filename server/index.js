@@ -17,6 +17,7 @@ const HistoryRouter = require('./routes/HistoryRouter');
 const PaymentRouter = require('./routes/PaymentRouter');
 const { SessionCompletedWebHook } = require('./controller/PaymentController');
 const APIRouter = require('./routes/APIRouter');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Initialize Express app
 const app = express();
@@ -48,7 +49,9 @@ app.get('/', (req, res) => {
 app.use('/auth', AuthRouter);
 app.use('/history', HistoryRouter);
 app.use('/payment', PaymentRouter);
-app.use('/api', APIRouter)
+app.use('/api', APIRouter);
+
+app.use('/admin', adminRoutes)
 
 // Create HTTP server
 const server = http.createServer(app);
