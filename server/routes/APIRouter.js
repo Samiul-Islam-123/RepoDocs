@@ -59,7 +59,8 @@ APIRouter.get('/pricing', async(req,res) => {
 
 APIRouter.post('/upload-content', authenticateToken, async (req, res) => {
     // const userID = req.user.id;
-    console.log(req.user)
+    //console.log(req.user)
+    const userID = req.user.id
     const { content, historyID } = req.body;
     //console.log(content)
     try {
@@ -145,5 +146,6 @@ APIRouter.get('/get-pricing', async(req,res) => {
         pricing : Pricing
     });
 })
+
 
 module.exports = APIRouter;

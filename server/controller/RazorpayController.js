@@ -1,6 +1,7 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const axios = require('axios');
+const PricingModel = require('../models/PricingMode');
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -9,7 +10,19 @@ const razorpay = new Razorpay({
 
 const CreateOrder = async(req,res) => {
     try {
-        const { amount, currency } = req.body; // Get amount from frontend
+        const { amount, currency, pricingID } = req.body; // Get amount from frontend
+
+        const PricingData = await PricingModel.findOne({
+            _id : pricingID
+        })
+
+        if(!PricingData) {
+            return res.json({
+                success : false,
+                message : "Pricing package is invalid"
+            })
+        }
+
         const options = {
             amount: Math.round(Number(amount)) * 100, // Convert to paisa (Razorpay uses paisa)
             currency: currency || "INR",
