@@ -3,10 +3,10 @@ import { Bolt } from "@mui/icons-material";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency }) => {
-
-
+const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency , pricingID}) => {
+const navigate = useNavigate();
   useEffect(() => {
     console.log(parseFloat(price))
   }, [price])
@@ -44,6 +44,9 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
       // alert(response.data.message)
 
       //alert(price)
+
+
+
       const orderResponse = await fetch(`${import.meta.env.VITE_API_URL}/payment/razorpay-order`, {
         method: 'POST',
         headers: {
@@ -52,6 +55,7 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
         body: JSON.stringify({
           amount: price,//string format 
           currency: currency,
+          pricingID : pricingID
         }),
       });
 
@@ -85,10 +89,9 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
             //console.log(verifyData)
 
             if (verifyData.success === true) {
-              alert('Payment successful!');
               //api to update bolts
               const token = Cookies.get('token');
-
+              
               const UpdateResponse = await axios.post(
                 `${import.meta.env.VITE_API_URL}/api/bolt-pack`,
                 { boltPack: parseInt(bolts.match(/\d+/)[0], 10) },  // Request body
@@ -101,8 +104,9 @@ const PricingCard = ({ title, price, bolts, features, isPopular, mode, currency 
               );
 
               console.log(UpdateResponse)
-              alert(UpdateResponse.message)
-
+              alert('Payment successful!');
+              //alert(UpdateResponse.message)
+              navigate("/dashboard")
             } else {
               alert('Payment verification failed!');
             }

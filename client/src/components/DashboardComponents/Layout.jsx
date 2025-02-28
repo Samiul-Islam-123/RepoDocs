@@ -43,7 +43,7 @@ const collapsedDrawerWidth = 64
 
 const Layout = ({ children }) => {
   const { mode, toggleTheme } = useThemeContext()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [anchorEl, setAnchorEl] = useState(null)
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null)
   const theme = useTheme()

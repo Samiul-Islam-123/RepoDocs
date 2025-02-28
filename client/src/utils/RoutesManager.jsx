@@ -12,6 +12,7 @@ import PricingPage from '../pages/PricingPage';
 function ProtectedRoute({ children }) {
   const { isSignedIn, isLoaded } = useAuth(); // Check both authentication and loading state
   const {user} = useUser();
+  
 
   useEffect(() => {
     if (user) {
@@ -52,7 +53,9 @@ function RoutesManager() {
       <Route exact path="/" element={<LandingPage />} />
       <Route exact path="/signup/*" element={<Signup />} />
       <Route exact path="/login/*" element={<Login />} />
-      <Route exact path="/pricing" element={<PricingPage />} />
+      <Route exact path="/pricing" element={<ProtectedRoute>
+            <PricingPage />
+          </ProtectedRoute>} />
       
 
       {/* Protected Routes */}

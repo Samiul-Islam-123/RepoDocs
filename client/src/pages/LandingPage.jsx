@@ -9,6 +9,7 @@ import { createAppTheme } from '../theme'
 import { useThemeContext } from '../context/ThemeContext'
 import { useInView } from 'react-intersection-observer'
 import Footer from '../components/Footer'
+import { useNavigate } from 'react-router-dom'
 
 // Animation keyframes
 const gradientAnimation = keyframes`
@@ -22,12 +23,18 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
+
 function LandingPage() {
   const { mode, setMode } = useThemeContext();
   const theme = createAppTheme(mode);
   const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [featuresRef, featuresInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
+  
+  const navigate = useNavigate();
+  const handlePricingClick = () => {
+    navigate('/pricing'); // Redirect to /pricing when clicked
+  };
+  
   const handleToggleMode = () => {
     setMode(mode === 'light' ? 'dark' : 'light');
   };
@@ -64,7 +71,9 @@ function LandingPage() {
           <Features mode={mode} />
         </Box>
 
-        <Pricing mode={mode} />
+        <Box onClick={handlePricingClick} sx={{ cursor: 'pointer' }}>
+          <Pricing mode={mode} />
+        </Box>
         <Footer mode={mode} />
       </Box>
     </ThemeProvider>
