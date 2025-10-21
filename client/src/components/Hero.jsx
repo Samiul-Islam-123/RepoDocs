@@ -82,7 +82,7 @@ const Hero = ({ mode }) => {
             }
           }}
         >
-          <span>Perfect READMEs</span><br />
+          <span>Perfect READMEs Test2</span><br />
           <Box sx={{
             display: 'flex',
             justifyContent: 'center',
