@@ -1,4 +1,4 @@
-# RepoDocs: Your All-in-One Solution (AI powered)🚀
+# RepoDocs: Your All-in-One Solution (AI powered :))🚀
 
 [![GitHub repo size](https://img.shields.io/github/repo-size/Samiul-Islam-123/RepoDocs?style=flat-square)](https://github.com/Samiul-Islam-123/RepoDocs)
 [![GitHub stars](https://img.shields.io/github/stars/Samiul-Islam-123/RepoDocs?style=flat-square)](https://github.com/Samiul-Islam-123/RepoDocs/stargazers)
