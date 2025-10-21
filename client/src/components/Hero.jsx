@@ -82,7 +82,7 @@ const Hero = ({ mode }) => {
             }
           }}
         >
-          <span>Perfect READMEs akdom jhokas ;)</span><br />
+          <span>Perfect READMEs</span><br />
           <Box sx={{
             display: 'flex',
             justifyContent: 'center',
@@ -136,7 +136,7 @@ const Hero = ({ mode }) => {
               },
             }}
           >
-            Start Generating (Do it bhai, ki korsos)
+            Start Generating
           </Button>
           {/* <Button 
             variant="outlined" 
