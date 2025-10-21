@@ -136,7 +136,7 @@ const Hero = ({ mode }) => {
               },
             }}
           >
-            Start Generating
+            Start Generating (Do it bhai, ki korsos)
           </Button>
           {/* <Button 
             variant="outlined" 
